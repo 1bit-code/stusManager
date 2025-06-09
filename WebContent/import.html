@@ -1,1 +1,76 @@
 
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>批量导入学生</title>
+    <style>
+        .container {
+            max-width: 600px;
+            margin: 30px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .note {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #4CAF50;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>批量导入学生信息</h1>
+        <form action="ImportStudentServlet" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="excelFile">选择Excel文件:</label>
+                <input type="file" id="excelFile" name="excelFile" accept=".xls,.xlsx" required>
+            </div>
+            <button type="submit">开始导入</button>
+        </form>
+        <div class="note">
+            <p><strong>注意：</strong></p>
+            <p>1. 请使用标准Excel格式文件(.xls或.xlsx)</p>
+            <p>2. 第一行应为标题行(学号,姓名,年龄)</p>
+            <p>3. 文件大小不超过5MB</p>
+            <a href="list.html">返回学生列表</a>
+        </div>
+    </div>
+</body>
+
+</html>
