@@ -1,0 +1,138 @@
+// Source code is decompiled from a .class file using FernFlower decompiler.
+package dbutil;
+
+import java.io.PrintStream;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public class Dbconn {
+   private static final String DRIVER = "com.mysql.cj.jdbc.Driver";
+   private static final String URL = "jdbc:mysql://localhost:3306/students?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC";
+   private static final String USER = "root";
+   private static final String PASSWORD = "root";
+   private Connection conn = null;
+   private Statement stmt = null;
+   private ResultSet rs = null;
+
+   public Dbconn() {
+   }
+
+   public Connection getConnection() {
+      try {
+         Class.forName("com.mysql.cj.jdbc.Driver");
+         this.conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/students?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC", "root", "root");
+      } catch (ClassNotFoundException var2) {
+         System.out.println("数据库驱动加载失败！");
+         var2.printStackTrace();
+      } catch (SQLException var3) {
+         System.out.println("数据库连接失败！");
+         var3.printStackTrace();
+      }
+
+      return this.conn;
+   }
+
+   public void closeAll() {
+      try {
+         if (this.rs != null) {
+            this.rs.close();
+         }
+
+         if (this.stmt != null) {
+            this.stmt.close();
+         }
+
+         if (this.conn != null) {
+            this.conn.close();
+         }
+      } catch (SQLException var2) {
+         System.out.println("关闭数据库连接失败！");
+         var2.printStackTrace();
+      }
+
+   }
+
+   public ResultSet executeQuery(String var1) {
+      try {
+         this.conn = this.getConnection();
+         this.stmt = this.conn.createStatement();
+         this.rs = this.stmt.executeQuery(var1);
+      } catch (SQLException var3) {
+         System.out.println("执行查询失败！");
+         var3.printStackTrace();
+      }
+
+      return this.rs;
+   }
+
+   public int executeUpdate(String var1) {
+      int var2 = 0;
+
+      try {
+         this.conn = this.getConnection();
+         this.stmt = this.conn.createStatement();
+         var2 = this.stmt.executeUpdate(var1);
+      } catch (SQLException var4) {
+         System.out.println("执行更新失败！");
+         var4.printStackTrace();
+      }
+
+      return var2;
+   }
+
+   public static void main(String[] var0) {
+      Dbconn var1 = new Dbconn();
+
+      try {
+         Connection var2 = var1.getConnection();
+         System.out.println("数据库连接成功！");
+         DatabaseMetaData var3 = var2.getMetaData();
+         ResultSet var4 = var2.getMetaData().getCatalogs();
+         boolean var5 = false;
+
+         while(var4.next()) {
+            if ("students".equalsIgnoreCase(var4.getString(1))) {
+               var5 = true;
+               break;
+            }
+         }
+
+         var4.close();
+         if (!var5) {
+            System.out.println("students数据库不存在");
+         } else {
+            System.out.println("students数据库存在");
+            ResultSet var6 = var3.getTables((String)null, (String)null, "student", new String[]{"TABLE"});
+            if (var6.next()) {
+               System.out.println("student表存在");
+               Statement var7 = var2.createStatement();
+               ResultSet var8 = var7.executeQuery("DESCRIBE student");
+               System.out.println("\nstudent表结构：");
+
+               while(var8.next()) {
+                  PrintStream var10000 = System.out;
+                  String var10001 = var8.getString("Field");
+                  var10000.println(var10001 + "\t" + var8.getString("Type") + "\t" + var8.getString("Null") + "\t" + var8.getString("Key") + "\t" + var8.getString("Default"));
+               }
+
+               var8.close();
+               var7.close();
+            } else {
+               System.out.println("student表不存在");
+            }
+
+            var6.close();
+         }
+
+         var1.closeAll();
+      } catch (Exception var9) {
+         System.out.println("数据库连接测试失败：" + var9.getMessage());
+         var9.printStackTrace();
+      }
+
+   }
+}
