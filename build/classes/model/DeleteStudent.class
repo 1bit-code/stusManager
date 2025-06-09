@@ -1,0 +1,99 @@
+// Source code is decompiled from a .class file using FernFlower decompiler.
+package model;
+
+import dbutil.Dbconn;
+import java.sql.ResultSet;
+
+public class DeleteStudent {
+   private Dbconn dbconn = new Dbconn();
+
+   public DeleteStudent() {
+   }
+
+   public boolean deleteStudent(int id) {
+      String sql = "DELETE FROM student WHERE id = " + id;
+      int result = this.dbconn.executeUpdate(sql);
+      return result > 0;
+   }
+
+   public boolean batchDeleteStudents(int[] ids) {
+      if (ids != null && ids.length != 0) {
+         StringBuilder sql = new StringBuilder("DELETE FROM student WHERE id IN (");
+
+         int result;
+         for(result = 0; result < ids.length; ++result) {
+            sql.append(ids[result]);
+            if (result < ids.length - 1) {
+               sql.append(",");
+            }
+         }
+
+         sql.append(")");
+         result = this.dbconn.executeUpdate(sql.toString());
+         if (result > 0) {
+            return true;
+         } else {
+            return false;
+         }
+      } else {
+         return false;
+      }
+   }
+
+   public boolean deleteStudentsByCondition(String condition) {
+      String sql = "DELETE FROM student WHERE " + condition;
+      int result = this.dbconn.executeUpdate(sql);
+      return result > 0;
+   }
+
+   public boolean deleteStudentsByGrade(String grade) {
+      String sql = "DELETE FROM student WHERE grade = '" + grade + "'";
+      int result = this.dbconn.executeUpdate(sql);
+      return result > 0;
+   }
+
+   public boolean checkStudentExists(int id) {
+      String sql = "SELECT COUNT(*) as count FROM student WHERE id = " + id;
+
+      try {
+         ResultSet rs = this.dbconn.executeQuery(sql);
+         if (rs.next()) {
+            boolean var5 = rs.getInt("count") > 0;
+            return var5;
+         }
+      } catch (Exception var8) {
+         var8.printStackTrace();
+      } finally {
+         this.dbconn.closeAll();
+      }
+
+      return false;
+   }
+
+   public boolean clearAllStudents() {
+      String sql = "DELETE FROM student";
+      int result = this.dbconn.executeUpdate(sql);
+      return result >= 0;
+   }
+
+   public int getAffectedRows(String condition) {
+      String sql = "SELECT COUNT(*) as count FROM student WHERE " + condition;
+
+      int var5;
+      try {
+         ResultSet rs = this.dbconn.executeQuery(sql);
+         if (!rs.next()) {
+            return 0;
+         }
+
+         var5 = rs.getInt("count");
+      } catch (Exception var8) {
+         var8.printStackTrace();
+         return 0;
+      } finally {
+         this.dbconn.closeAll();
+      }
+
+      return var5;
+   }
+}
